@@ -7,7 +7,7 @@ from random import shuffle
 
 
 def main(argv):
-	help_str = 'script.py -i <input_dir> -s <box-size> -a <minisat arguments, delimit with .>'
+	help_str = 'aut_parser.py -i <input_dir> -s <box-size> -a <minisat arguments, delimit with .  >'
 	try:
 		opts, args = getopt.getopt(argv,"hi:s:a:",["input_dir=","size=","args="])
 
@@ -54,27 +54,27 @@ def main(argv):
 	for dimac_file in dimacs:
 		line_cntr +=1
 		dimac_file_path = os.path.join(dimacs_path, dimac_file)
-		original_file = open(dimac_file_path,'r').read()
+		original_file = open(dimac_file_path,'r')
+		
 		if(line_cntr >0):
-			for i in range(20):
-				
-				
+			for i in range(1):
 				num_sudokus +=1
-				print("Solving the {0}th randomization of the {1}th file".format(i,line_cntr))
-				temp_file, n_lines = randomize_file(original_file)
-				temp_path = os.path.realpath(temp_file.name)
+				#print("Solving the {0}th randomization of the {1}th file".format(i,line_cntr))
+				#temp_file, n_lines = randomize_file(original_file.read())
+				n_lines = 10
+				temp_path = os.path.realpath(original_file.name)
 				execution_line = './minisat_static {0} {1}'.format(temp_path, minisat_arguments)
-				s_time = time.process_time()
-				minisat_EXE = os.popen(execution_line)
-				e_time = time.process_time()
-				d_time = e_time - s_time - base_time
-				print(d_time)
-				
-				total_time += (d_time)
-				minisat_out = minisat_EXE.read()
-				#print(minisat_out)
-				result = get_stats(minisat_out, d_time,n_lines)
-				result_list.append(result)
+				for redo in range(10): #redo experiment 100 times
+					print("Solving the {}th redo of the {}th file".format(redo,line_cntr))
+					s_time = time.process_time()
+					minisat_EXE = os.popen(execution_line)
+					e_time = time.process_time()
+					d_time = e_time - s_time - base_time
+					total_time += (d_time)
+					minisat_out = minisat_EXE.read()
+					#print(minisat_out)
+					result = get_stats(minisat_out, d_time,n_lines)
+					result_list.append(result)
 	output_name = "OUTPUT_s{0}_a{1}.txt".format(size,minisat_arguments)
 	output = open(output_name,"w")
 	parse_results(result_list, output, num_binary)
@@ -88,6 +88,8 @@ def check_base_time(filename):
 	return e-s
 	
 def parse_results(list, file, num_binary):
+	conf_lit_list = []
+	conflict_list = []
 	CPU_list = [] 
 	parse_list = [] 
 	measured_time_list = []
@@ -98,27 +100,35 @@ def parse_results(list, file, num_binary):
 		print(result.num_clauses)
 		print(num_binary)
 		bin_ratio =  num_binary/int(result.num_clauses)
+		conflict_list.append(result.conflicts)
+		conf_lit_list.append(result.conf_literals)
 		CPU_list.append(result.CPU_time)
 		parse_list.append(result.parse_time)
 		bin_ratio_list.append(bin_ratio)
-		measured_time_list.append(result.measured_time)
-		fk_clauses_list.append(int(result.num_clauses_fk))
+		#measured_time_list.append(result.measured_time)
+		#fk_clauses_list.append(int(result.num_clauses_fk))
 		clauses_list.append(result.num_clauses)
+	file.write("Conflict literals \n")
+	simplejson.dump(conf_lit_list,file)
+	file.write("\n")
+	file.write("Num conflicts \n")
+	simplejson.dump(conflict_list,file)
+	file.write("\n")
 	file.write("CPU_LIST \n")
 	simplejson.dump(CPU_list,file)
 	file.write("\n")
 	file.write("parse_list \n")
 	simplejson.dump(parse_list,file)
 	file.write("\n")
-	file.write("measured_time_list \n")
-	simplejson.dump(measured_time_list,file)
-	file.write("\n")
+	#file.write("measured_time_list \n")
+	#simplejson.dump(measured_time_list,file)
+	#file.write("\n")
 	file.write("bin_ratio_list \n")
 	simplejson.dump(bin_ratio_list,file)
 	file.write("\n")
-	file.write("fk_clauses_list \n")
-	simplejson.dump(fk_clauses_list,file)
-	file.write("\n")
+	#file.write("fk_clauses_list \n")
+	#simplejson.dump(fk_clauses_list,file)
+	#file.write("\n")
 	file.write("clauses_list \n")
 	simplejson.dump(clauses_list,file)
 	print("DONE")
@@ -141,7 +151,11 @@ def get_stats(minisat_out, measured_time, n_lines):
 		if "CPU time" in line:
 			CPU_time = line.split(':')[1].strip().split('s')[0]
 			#print("CPU TIME: "+CPU_time)	
-	return Minisat_result(CPU_time, parse_time, num_vars, num_cl, measured_time,n_lines-1)
+		if "conflicts" in line:
+			conflicts = line.split(':')[1].strip().split('(')[0]
+		if "conflict literals" in line:
+			conf_literals = line.split(':')[1].strip().split('(')[0]
+	return Minisat_result(conf_literals, conflicts, CPU_time, parse_time, num_vars, num_cl, measured_time,n_lines-1)
 
 
 def randomize_file(input_file):
@@ -180,13 +194,16 @@ def reorder(line):
 	return new_line
 
 class Minisat_result:
+	conflicts = 0
 	CPU_time = 0 #Sec
 	parse_time = 0 #sec
 	num_vars = 0
 	num_clauses_fk = 0
 	num_clauses = 0
 	measured_time = 0
-	def __init__(self, CPU_time, parse_time, num_vars, num_clauses_fk, measured_time, num_clauses):
+	def __init__(self, conf_literals,conflicts, CPU_time, parse_time, num_vars, num_clauses_fk, measured_time, num_clauses):
+		self.conf_literals = conf_literals
+		self.conflicts = conflicts
 		self.CPU_time = CPU_time
 		self.parse_time = parse_time
 		self.num_vars = num_vars
