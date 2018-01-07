@@ -96,8 +96,8 @@ import matplotlib.pyplot as plt
 def get_std_per_puzzle(dataset, step):
 	puzzle_stds = []
 	puzzle_means = []
-	print(dataset.name)
-	print(len(dataset.CPU_time))
+	#print(dataset.name)
+	#print(len(dataset.CPU_time))
 	for i in range(0,len(dataset.CPU_time),step):
 		puzzle_results = []
 		for j in range(step):
@@ -106,6 +106,38 @@ def get_std_per_puzzle(dataset, step):
 		puzzle_stds.append(np.std(puzzle_results))
 		puzzle_means.append(np.mean(puzzle_results))
 	return puzzle_stds, puzzle_means
+
+
+
+s4n,m4n = get_std_per_puzzle(nwp4,100)
+s5n,m5n = get_std_per_puzzle(nwp5,100)
+s6n,m6n=get_std_per_puzzle(nwp6,10)
+s4w,m4w= get_std_per_puzzle(wp4,100)
+s5w,m5w = get_std_per_puzzle(wp5,100)
+s6w,m6w=get_std_per_puzzle(wp6,10)
+
+
+db = '#013a96'
+lb = '#afceff'
+dr = '#960000'
+lr = '#ff8787'
+dg = '#00680a'
+lg = '#4af74d'
+
+
+plt.scatter(s4n,m4n, color=db,s=2,label='size 4 CB')
+plt.scatter(s4w,m4w, color=lb,s=2,alpha=0.8,label='size 4 2WL')
+plt.scatter(s5n,m5n, color=dr,s=2,label='size 5 CB')
+plt.scatter(s5w,m5w, color=lr,s=2,alpha=0.8,label='size 5 2WL')
+plt.scatter(s6n,m6n, color=dg,s=2,label='size 6 CB')
+plt.scatter(s6w,m6w, color=lg,s=2,alpha=0.8,label='size 6 2WL')
+
+plt.xlabel('Average CPU time (sec)')
+plt.ylabel('Standard deviation (sec)')
+plt.title('Correlation of average CPU time with standard deviation.')
+plt.legend(loc='upper left',prop={'size': 10})
+plt.show()
+
 
 def get_mean_difference_per_run(wp,nwp, step):
 	puzzle_stds = []
@@ -154,18 +186,18 @@ def plot_distribution(title,*args):
 ####################
 
 
-s4nw,m4nw = get_std_per_puzzle(nwp4,100)
-s4w,m4w = get_std_per_puzzle(wp4,100)
+# s4nw,m4nw = get_std_per_puzzle(nwp4,100)
+# s4w,m4w = get_std_per_puzzle(wp4,100)
 
-s5nw,m5nw = get_std_per_puzzle(nwp5,100)
-s5w,m5w = get_std_per_puzzle(wp5,100)
+# s5nw,m5nw = get_std_per_puzzle(nwp5,100)
+# s5w,m5w = get_std_per_puzzle(wp5,100)
 
-s6nw,m6nw = get_std_per_puzzle(nwp6,10)
-s6w,m6w = get_std_per_puzzle(wp6,10)
+# s6nw,m6nw = get_std_per_puzzle(nwp6,10)
+# s6w,m6w = get_std_per_puzzle(wp6,10)
 
-s4dif_std,s4dif_mean = get_mean_difference_per_run(wp4,nwp4,100)
-s5dif_std,s5dif_mean = get_mean_difference_per_run(wp5,nwp5,100)
-s6dif_std,s6dif_mean = get_mean_difference_per_run(wp6,nwp6,10)
+# s4dif_std,s4dif_mean = get_mean_difference_per_run(wp4,nwp4,100)
+# s5dif_std,s5dif_mean = get_mean_difference_per_run(wp5,nwp5,100)
+# s6dif_std,s6dif_mean = get_mean_difference_per_run(wp6,nwp6,10)
 
 #plt.subplot(211)
 #x = np.arange(1050)
@@ -174,65 +206,81 @@ s6dif_std,s6dif_mean = get_mean_difference_per_run(wp6,nwp6,10)
 #plt.show()
 #plt.show()
 
-print("This is the standard deviation of CPU time over 100 runs, averaged over all puzzles.")
-print("Average standard deviation size4 CB: {}".format(np.mean(s4nw)))
-print("Average standard deviation size4 2WL: {}".format(np.mean(s4w)))
-print("The average difference between 2wp run and cb run is: {}".format(np.mean(s4dif_mean))) 
-print('\n')
-print("Average standard deviation size5 CB: {}".format(np.mean(s5nw)))
-print("Average standard deviation size5 2WL: {}".format(np.mean(s5w)))
-print("The average difference between 2wp run and cb run is: {}".format(np.mean(s5dif_mean))) 
-print('\n')
+# print("This is the standard deviation of CPU time over 100 runs, averaged over all puzzles.")
+# print("Average standard deviation size4 CB: {}".format(np.mean(s4nw)))
+# print("Average standard deviation size4 2WL: {}".format(np.mean(s4w)))
+# print("The average difference between 2wp run and cb run is: {}".format(np.mean(s4dif_mean))) 
+# print('\n')
+# print("Average standard deviation size5 CB: {}".format(np.mean(s5nw)))
+# print("Average standard deviation size5 2WL: {}".format(np.mean(s5w)))
+# print("The average difference between 2wp run and cb run is: {}".format(np.mean(s5dif_mean))) 
+# print('\n')
 
-print("Average standard deviation size6 CB: {}".format(np.mean(s6nw)))
-print("Average standard deviation size6 2WL: {}".format(np.mean(s6w)))
-print("The average difference between 2wp run and cb run is: {}".format(np.mean(s6dif_mean))) 
-print('\n')
-
-
-
-print("Average standard deviation of difference per puzzle run size 4: {}".format(np.mean(s4dif_std)))
-print("Average standard deviation of difference per puzzle run size 5: {}".format(np.mean(s5dif_std)))
-print("Average standard deviation of difference per puzzle run size 6: {}".format(np.mean(s6dif_std)))
+# print("Average standard deviation size6 CB: {}".format(np.mean(s6nw)))
+# print("Average standard deviation size6 2WL: {}".format(np.mean(s6w)))
+# print("The average difference between 2wp run and cb run is: {}".format(np.mean(s6dif_mean))) 
+# print('\n')
 
 
 
-print("Average mean of difference per puzzle run size 4: {}".format(np.mean(s4dif_mean)))
-print("Average mean of difference per puzzle run size 5: {}".format(np.mean(s5dif_mean)))
-print("Average mean of difference per puzzle run size 6: {}".format(np.mean(s6dif_mean)))
+# print("Average standard deviation of difference per puzzle run size 4: {}".format(np.mean(s4dif_std)))
+# print("Average standard deviation of difference per puzzle run size 5: {}".format(np.mean(s5dif_std)))
+# print("Average standard deviation of difference per puzzle run size 6: {}".format(np.mean(s6dif_std)))
 
 
-mu4 = np.mean(nwp4.conflicts)
-sigma4 = np.std(nwp4.conflicts)
-x4 = nwp4.conflicts
-num_bins = 50
-n, bins4, patches = plt.hist(x4, num_bins, normed=1, facecolor='r', alpha=0.2)
-#print(bins)
-y4 = mlab.normpdf(bins4, mu4, sigma4)
-plt.plot(bins4, y4, 'r', label='size 4')
+
+# print("Average mean of difference per puzzle run size 4: {}".format(np.mean(s4dif_mean)))
+# print("Average mean of difference per puzzle run size 5: {}".format(np.mean(s5dif_mean)))
+# print("Average mean of difference per puzzle run size 6: {}".format(np.mean(s6dif_mean)))
+
+# print("s4 CB mean: {}".format(np.mean(m4nw)))
+# print("s4 2LW mean: {}".format(np.mean(m4w)))
+
+# print("s5 CB mean: {}".format(np.mean(m5nw)))
+# print("s5 2LW mean: {}".format(np.mean(m5w)))
+
+# print("s6 CB mean: {}".format(np.mean(m6nw)))
+# print("s6 2LW mean: {}".format(np.mean(m6w)))
+
+# print("s4 dif std {}".format(np.mean(s4dif_std)))
+
+# print("s5 dif std {}".format(np.mean(s5dif_std)))
+
+# print("s6 dif std {}".format(np.mean(s6dif_std)))
+
+# s4dif_std
+
+# mu4 = np.mean(nwp4.conflicts)
+# sigma4 = np.std(nwp4.conflicts)
+# x4 = nwp4.conflicts
+# num_bins = 50
+# n, bins4, patches = plt.hist(x4, num_bins, normed=1, facecolor='r', alpha=0.2)
+# #print(bins)
+# y4 = mlab.normpdf(bins4, mu4, sigma4)
+# plt.plot(bins4, y4, 'r', label='size 4')
 
 
-mu5 = np.mean(nwp5.conflicts)
-sigma5 = np.std(nwp5.conflicts)
-x5 = nwp5.conflicts
-num_bins = 50
-n, bins5, patches = plt.hist(x5, num_bins, normed=1, facecolor='b', alpha=0.2)
-#print(bins)
-y5 = mlab.normpdf(bins5, mu5, sigma5)
-plt.plot(bins5, y5, 'b', label='size 5')
+# mu5 = np.mean(nwp5.conflicts)
+# sigma5 = np.std(nwp5.conflicts)
+# x5 = nwp5.conflicts
+# num_bins = 50
+# n, bins5, patches = plt.hist(x5, num_bins, normed=1, facecolor='b', alpha=0.2)
+# #print(bins)
+# y5 = mlab.normpdf(bins5, mu5, sigma5)
+# plt.plot(bins5, y5, 'b', label='size 5')
 
-mu6 = np.mean(nwp6.conflicts)
-sigma6 = np.std(nwp6.conflicts)
-x6 = nwp6.conflicts
-num_bins = 50
-n, bins6, patches = plt.hist(x6, num_bins, normed=1, facecolor='g', alpha=0.2)
-#print(bins)
-y6 = mlab.normpdf(bins6, mu6, sigma6)
-plt.plot(bins6, y6, 'g', label='size 6')
+# mu6 = np.mean(nwp6.conflicts)
+# sigma6 = np.std(nwp6.conflicts)
+# x6 = nwp6.conflicts
+# num_bins = 50
+# n, bins6, patches = plt.hist(x6, num_bins, normed=1, facecolor='g', alpha=0.2)
+# #print(bins)
+# y6 = mlab.normpdf(bins6, mu6, sigma6)
+# plt.plot(bins6, y6, 'g', label='size 6')
 
-plt.ylabel('Count')
-plt.xlabel('Number of conflicts')
-plt.show()
+# plt.ylabel('Count')
+# plt.xlabel('Number of conflicts')
+#plt.show()
 # d = get_index_by_num_conflicts(nwp.conflicts)
 # stds = []
 # means = []
@@ -255,7 +303,7 @@ plt.show()
 # #plt.axis((0,25,-0.015,.015))
 # #plt.subplot(212)
 # y = np.array(nwp.CPU_time)-np.array(wp.CPU_time)
-# x = nwp.conflicts
+# x = nwp.conflictsgit 
 # plt.scatter(x,y, s=3, alpha=0.002,color='darkgrey')
 # plt.ylabel('Difference CPU time (CB - 2WL)')
 # plt.xlabel('Number of conflicts')
